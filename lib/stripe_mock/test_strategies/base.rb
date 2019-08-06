@@ -24,6 +24,15 @@ module StripeMock
         stripe_token.id
       end
 
+      def generate_declined_card_token(card_params={})
+        card_data = { :number => "4000000000000002", :exp_month => 9, :exp_year => (Time.now.year + 5), :cvc => "999", :tokenization_method => nil }
+        card = StripeMock::Util.card_merge(card_data, card_params)
+        card[:fingerprint] = StripeMock::Util.fingerprint(card[:number]) if StripeMock.state == 'local'
+
+        stripe_token = Stripe::Token.create(:card => card)
+        stripe_token.id
+      end
+
       def generate_bank_token(bank_account_params={})
         currency = bank_account_params[:currency] || StripeMock.default_currency
         bank_account = {
